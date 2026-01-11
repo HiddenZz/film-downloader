@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id("org.springframework.boot") version "3.5.0"
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.flywaydb.flyway' version '11.9.1'
+}
+
+group = 'org.film.parser'
+version = '1.0-SNAPSHOT'
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+
+    implementation("redis.clients:jedis:7.2.0")
+    implementation("org.postgresql:postgresql:42.7.7")
+    implementation 'org.mybatis:mybatis:3.5.19'
+    implementation 'org.flywaydb:flyway-core'
+    implementation("io.reactivex.rxjava3:rxjava:3.1.11")
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    implementation("io.minio:minio:8.5.17")
+    implementation 'io.lindstrom:m3u8-parser:0.29'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    runtimeOnly 'org.flywaydb:flyway-database-postgresql'
+
+    compileOnly 'org.projectlombok:lombok'
+
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}

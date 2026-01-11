@@ -1,0 +1,38 @@
+
+storage:
+  minio:
+    credentials:
+      endpoint: http://127.0.0.1:9000/
+      name: "minioadmin"
+      password: "minioadmin123"
+
+  redis:
+    url: "localhost"
+    port: 6379
+
+server:
+  port: 8085
+
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: film_stream
+    default-schema: film_stream
+  datasource:
+    url: jdbc:postgresql://localhost:5432/movie?currentSchema=film_stream
+    username: movie_user
+    password: movie
+    driver-class-name: org.postgresql.Driver
+
+logging:
+  level:
+    org.apache.ibatis: DEBUG
+    org.film.parser.feature.movie.detail.repository: TRACE
+    org.film.parser.feature.playlist.repository: DEBUG
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    org.springframework.jdbc.core.StatementCreatorUtils: TRACE
+    org.springframework.web.client.RestTemplate: DEBUG
+    org.apache.http: DEBUG
+    httpclient.wire: DEBUG
+    org.film.parser: DEBUG
