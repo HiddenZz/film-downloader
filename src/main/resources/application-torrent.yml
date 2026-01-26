@@ -1,0 +1,6 @@
+downloader:
+  group: downloader-torrent
+  name: torrent
+
+bt-config:
+  temp-dir: "/tmp/bt-debug"

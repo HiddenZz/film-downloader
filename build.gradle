@@ -14,9 +14,18 @@ repositories {
 }
 
 dependencies {
-
+    implementation("org.springframework.boot:spring-boot-starter-data-redis:3.5.9")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
+
+    // torrents
+    implementation("com.github.atomashpolskiy:bt-core:1.10")
+    implementation("com.github.atomashpolskiy:bt-http-tracker-client:1.10")
+    implementation("com.github.atomashpolskiy:bt-dht:1.10")
+
+    // content formatter
+    implementation("net.bramp.ffmpeg:ffmpeg:0.8.0")
+
 
     implementation("redis.clients:jedis:7.2.0")
     implementation("org.postgresql:postgresql:42.7.7")
@@ -25,7 +34,6 @@ dependencies {
     implementation("io.reactivex.rxjava3:rxjava:3.1.11")
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.mapstruct:mapstruct:1.6.3'
     implementation 'org.mapstruct:mapstruct:1.6.3'
     implementation("io.minio:minio:8.5.17")
     implementation 'io.lindstrom:m3u8-parser:0.29'

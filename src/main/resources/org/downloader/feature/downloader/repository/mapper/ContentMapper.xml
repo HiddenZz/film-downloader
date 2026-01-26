@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.downloader.feature.downloader.repository.mapper.ContentMapper">
+
+    <select id="insert" resultType="int">
+        INSERT INTO content(content_uuid, tmdb_id, state)
+        VALUES (#{dto.contentUuid}, #{dto.tmdbId}, #{dto.state}) RETURNING id
+    </select>
+
+    <update id="updateState">
+        UPDATE content
+        SET minio_key   = COALESCE(#{dto.minioKey}, minio_key),
+            state       = COALESCE(#{dto.state}, state),
+            progress    = COALESCE(#{dto.progress}, progress),
+            error_cause = COALESCE(#{dto.errorCause}, error_cause),
+            updated_at  = NOW()
+        WHERE content_uuid = #{dto.contentUuid}
+    </update>
+
+
+</mapper>

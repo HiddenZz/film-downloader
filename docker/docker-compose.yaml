@@ -1,0 +1,23 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    volumes:
+      - ~/.m2:/root/.m2
+    depends_on:
+      - redis
+
+networks:
+  postgres_network:
+  app-network:
+    driver: bridge
+
+volumes:
+  minio_dev_data:
+  postgres_data:
+  redis_data:
+    driver: local
