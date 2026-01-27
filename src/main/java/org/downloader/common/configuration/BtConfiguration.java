@@ -1,4 +1,4 @@
-package org.downloader.core.configuration;
+package org.downloader.common.configuration;
 
 import bt.Bt;
 import bt.BtClientBuilder;
@@ -7,19 +7,15 @@ import bt.data.file.FileSystemStorage;
 import bt.dht.DHTConfig;
 import bt.dht.DHTModule;
 import bt.protocol.crypto.EncryptionPolicy;
-import bt.runtime.BtClient;
 import bt.runtime.BtRuntime;
 import bt.runtime.Config;
 import bt.torrent.selector.PieceSelector;
 import bt.torrent.selector.SequentialSelector;
-import org.downloader.core.configuration.properties.BtProperties;
-import org.springframework.beans.factory.annotation.Value;
+import org.downloader.common.configuration.properties.BtProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.File;
-import java.net.InetAddress;
 import java.nio.file.Paths;
 
 @Configuration

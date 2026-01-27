@@ -5,14 +5,13 @@
 <mapper namespace="org.downloader.feature.downloader.repository.mapper.ContentMapper">
 
     <select id="insert" resultType="int">
-        INSERT INTO content(content_uuid, tmdb_id, state)
+        INSERT INTO content_state(content_uuid, tmdb_id, state)
         VALUES (#{dto.contentUuid}, #{dto.tmdbId}, #{dto.state}) RETURNING id
     </select>
 
     <update id="updateState">
-        UPDATE content
-        SET minio_key   = COALESCE(#{dto.minioKey}, minio_key),
-            state       = COALESCE(#{dto.state}, state),
+        UPDATE content_state
+        SET state       = COALESCE(#{dto.state}, state),
             progress    = COALESCE(#{dto.progress}, progress),
             error_cause = COALESCE(#{dto.errorCause}, error_cause),
             updated_at  = NOW()

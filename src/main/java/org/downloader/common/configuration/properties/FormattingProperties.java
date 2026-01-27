@@ -1,4 +1,4 @@
-package org.downloader.core.configuration.properties;
+package org.downloader.common.configuration.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

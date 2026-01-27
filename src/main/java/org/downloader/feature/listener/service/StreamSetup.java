@@ -4,8 +4,8 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.downloader.core.configuration.properties.DownloaderProperties;
-import org.downloader.core.configuration.properties.FormattingProperties;
+import org.downloader.common.configuration.properties.DownloaderProperties;
+import org.downloader.common.configuration.properties.FormattingProperties;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
@@ -25,7 +25,7 @@ public class StreamSetup {
 
     final FormattingProperties formattingProperties;
     final FormattingListenerService formattingListenerService;
-    
+
     @PostConstruct
     void init() {
         startDownloadListening();

@@ -4,10 +4,9 @@ import bt.BtClientBuilder;
 import bt.runtime.BtClient;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.downloader.core.configuration.properties.BtProperties;
+import org.downloader.common.configuration.properties.BtProperties;
 import org.downloader.feature.downloader.model.DownloadTask;
 import org.downloader.feature.downloader.model.TorrentTask;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -33,7 +32,7 @@ public class TorrentDownloaderService implements DownloaderService {
         final Path tempDir = tempTorrentPath(payload.cacheGuid(), downloadTorrentFile(payload));
         final StateReporterHelper reporter = new StateReporterHelper(progressService, payload, tempDir);
 
-        AtomicBoolean isDownload = new AtomicBoolean(false);
+        final AtomicBoolean isDownload = new AtomicBoolean(false);
 
         try {
             reporter.starting();
@@ -47,7 +46,7 @@ public class TorrentDownloaderService implements DownloaderService {
                     .torrent(tempDir.toUri().toURL())
                     .build();
 
-            final var f = btClient.startAsync((state) -> {
+            btClient.startAsync((state) -> {
                 if (isDownload.get()) {
                     return;
                 }
@@ -55,9 +54,6 @@ public class TorrentDownloaderService implements DownloaderService {
                 reporter.progress(state);
             }, 1000).join();
 
-            if (f != null) {
-                log.info("Future {}, type {}", f, f.getClass());
-            }
         } catch (Exception e) {
             log.error("Error during download torrent file for error {} task {}", e, data);
         }

@@ -19,6 +19,7 @@ public sealed interface ContentState permits ContentState.Starting, ContentState
             case Success _ -> "SUCCESS";
         };
     }
+    
 
     @Builder
     record Starting(long tmdbId, String contentUuid) implements ContentState {

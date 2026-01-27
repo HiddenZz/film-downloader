@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.downloader.core.utils.Completer;
+import org.downloader.common.utils.Completer;
 import org.downloader.feature.downloader.model.DownloadTask;
 import org.downloader.feature.downloader.model.FormattingTask;
 import org.downloader.feature.downloader.service.DownloaderService;

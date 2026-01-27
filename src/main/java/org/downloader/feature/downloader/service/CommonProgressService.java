@@ -1,15 +1,12 @@
 package org.downloader.feature.downloader.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.downloader.feature.downloader.event.ContentEventPublisher;
 import org.downloader.feature.downloader.model.ContentDto;
 import org.downloader.feature.downloader.model.ContentState;
 import org.downloader.feature.downloader.repository.ContentRepository;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 
 @Service
@@ -17,49 +14,72 @@ import java.util.Map;
 @Slf4j
 public class CommonProgressService implements ProgressService {
 
-    private final StringRedisTemplate redisTemplate;
-    private final ObjectMapper objectMapper;
     private final ContentRepository contentRepository;
+    private final ContentEventPublisher eventPublisher;
 
     @Override
     public void report(ContentState state) {
-        final ContentDto.ContentDtoBuilder builder = ContentDto.builder()
-                .tmdbId(state.tmdbId())
-                .state(state.name())
-                .contentUuid(state.contentUuid());
-
         switch (state) {
-            case ContentState.Progressing s -> builder.progress(s.progress());
-            case ContentState.Success s -> builder.minioKey(s.minioUrl());
-            default -> {
-            }
-        }
-
-        if (state instanceof ContentState.Starting(long tmdbId, String contentUuid)) {
-            try {
-                contentRepository.create(builder.progress(0)
-                                                 .build());
-            } catch (Exception e) {
-                log.error("Error creating content state row error {} uuid {} tmdbId {}", e, contentUuid, tmdbId);
-            }
-            return;
-        }
-
-        contentRepository.updateState(builder.build());
-
-        if (state instanceof ContentState.DownloadSuccess s) {
-            sendToFormatting(s);
+            case ContentState.Starting s -> handleStarting(s);
+            case ContentState.Progressing s -> handleProgress(s);
+            case ContentState.DownloadSuccess s -> handleDownloadSuccess(s);
+            case ContentState.Success s -> handleSuccess(s);
+            case ContentState.DownloadError s -> handleError(s);
+            case ContentState.Formatting s -> handleFormatting(s);
+            case ContentState.FormattingError s -> handleFormattingError(s);
         }
     }
 
+    private void handleStarting(ContentState.Starting state) {
+        contentRepository.create(ContentDto.builder()
+                                         .tmdbId(state.tmdbId())
+                                         .contentUuid(state.contentUuid())
+                                         .state(state.name())
+                                         .progress(0)
+                                         .build());
+    }
 
-    void sendToFormatting(ContentState.DownloadSuccess state) {
-        try {
-            redisTemplate.opsForStream()
-                    .add("formatting:stream", Map.of("data", objectMapper.writeValueAsString(state)));
+    private void handleProgress(ContentState.Progressing state) {
+        contentRepository.updateState(ContentDto.builder()
+                                              .tmdbId(state.tmdbId())
+                                              .contentUuid(state.contentUuid())
+                                              .state(state.name())
+                                              .progress(state.progress())
+                                              .build());
+    }
 
-        } catch (Exception e) {
-            report(new ContentState.FormattingError(state.tmdbId(), state.contentUuid()));
-        }
+    private void handleDownloadSuccess(ContentState.DownloadSuccess state) {
+        contentRepository.updateState(toDto(state));
+        eventPublisher.sendToFormatting(state);
+    }
+
+    private void handleSuccess(ContentState.Success state) {
+        contentRepository.updateState(toDto(state));
+        eventPublisher.sendCompleted(state);
+    }
+
+    private void handleError(ContentState.DownloadError state) {
+        contentRepository.updateState(ContentDto.builder()
+                                              .tmdbId(state.tmdbId())
+                                              .contentUuid(state.contentUuid())
+                                              .state(state.name())
+                                              .errorCause(state.cause())
+                                              .build());
+    }
+
+    private void handleFormatting(ContentState.Formatting state) {
+        contentRepository.updateState(toDto(state));
+    }
+
+    private void handleFormattingError(ContentState.FormattingError state) {
+        contentRepository.updateState(toDto(state));
+    }
+
+    private ContentDto toDto(ContentState state) {
+        return ContentDto.builder()
+                .tmdbId(state.tmdbId())
+                .contentUuid(state.contentUuid())
+                .state(state.name())
+                .build();
     }
 }

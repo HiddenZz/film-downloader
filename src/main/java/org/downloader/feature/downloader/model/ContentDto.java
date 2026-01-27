@@ -11,6 +11,4 @@ public class ContentDto {
     String state;
     Integer progress;
     String errorCause;
-    String minioKey;
-
 }

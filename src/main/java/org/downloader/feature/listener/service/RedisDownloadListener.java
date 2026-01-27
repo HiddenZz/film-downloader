@@ -2,7 +2,7 @@ package org.downloader.feature.listener.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.downloader.core.configuration.properties.DownloaderProperties;
+import org.downloader.common.configuration.properties.DownloaderProperties;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;

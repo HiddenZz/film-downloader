@@ -1,4 +1,4 @@
-package org.downloader.core.utils;
+package org.downloader.common.utils;
 
 
 public interface Completer {

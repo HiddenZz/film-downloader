@@ -1,4 +1,4 @@
-package org.downloader.core.configuration;
+package org.downloader.common.configuration;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
