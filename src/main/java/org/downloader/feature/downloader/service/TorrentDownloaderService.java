@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.downloader.common.configuration.properties.BtProperties;
 import org.downloader.feature.downloader.model.DownloadTask;
 import org.downloader.feature.downloader.model.TorrentTask;
+import org.downloader.feature.progress.service.ProgressService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;

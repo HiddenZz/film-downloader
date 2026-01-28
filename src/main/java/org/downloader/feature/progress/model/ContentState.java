@@ -1,4 +1,4 @@
-package org.downloader.feature.downloader.model;
+package org.downloader.feature.progress.model;
 
 import lombok.Builder;
 
@@ -19,7 +19,7 @@ public sealed interface ContentState permits ContentState.Starting, ContentState
             case Success _ -> "SUCCESS";
         };
     }
-    
+
 
     @Builder
     record Starting(long tmdbId, String contentUuid) implements ContentState {

@@ -1,6 +1,6 @@
-package org.downloader.feature.downloader.repository;
+package org.downloader.feature.progress.repository;
 
-import org.downloader.feature.downloader.model.ContentDto;
+import org.downloader.feature.progress.model.ContentDto;
 
 public interface ContentRepository {
 
