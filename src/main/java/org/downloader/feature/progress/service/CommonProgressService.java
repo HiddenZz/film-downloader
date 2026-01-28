@@ -1,11 +1,11 @@
-package org.downloader.feature.downloader.service;
+package org.downloader.feature.progress.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.downloader.feature.downloader.event.ContentEventPublisher;
-import org.downloader.feature.downloader.model.ContentDto;
-import org.downloader.feature.downloader.model.ContentState;
-import org.downloader.feature.downloader.repository.ContentRepository;
+import org.downloader.feature.progress.event.ContentEventPublisher;
+import org.downloader.feature.progress.model.ContentDto;
+import org.downloader.feature.progress.model.ContentState;
+import org.downloader.feature.progress.repository.ContentRepository;
 import org.springframework.stereotype.Service;
 
 

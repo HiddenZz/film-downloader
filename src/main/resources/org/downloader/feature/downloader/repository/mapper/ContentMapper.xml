@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.downloader.feature.downloader.repository.mapper.ContentMapper">
+<mapper namespace="org.downloader.feature.progress.repository.mapper.ContentMapper">
 
     <select id="insert" resultType="int">
         INSERT INTO content_state(content_uuid, tmdb_id, state)

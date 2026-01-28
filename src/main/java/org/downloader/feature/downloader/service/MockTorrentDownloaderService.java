@@ -3,9 +3,10 @@ package org.downloader.feature.downloader.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.downloader.common.configuration.properties.BtProperties;
-import org.downloader.feature.downloader.model.ContentState;
+import org.downloader.feature.progress.model.ContentState;
 import org.downloader.feature.downloader.model.DownloadTask;
 import org.downloader.feature.downloader.model.TorrentTask;
+import org.downloader.feature.progress.service.ProgressService;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 

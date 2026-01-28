@@ -1,4 +1,4 @@
-package org.downloader.feature.downloader.model;
+package org.downloader.feature.progress.model;
 
 import lombok.Builder;
 import lombok.Data;

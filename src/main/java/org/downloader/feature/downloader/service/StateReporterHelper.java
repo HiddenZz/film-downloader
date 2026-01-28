@@ -5,8 +5,9 @@ import bt.metainfo.TorrentFile;
 import bt.torrent.TorrentSessionState;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.downloader.feature.downloader.model.ContentState;
+import org.downloader.feature.progress.model.ContentState;
 import org.downloader.feature.downloader.model.TorrentTask;
+import org.downloader.feature.progress.service.ProgressService;
 
 import java.nio.file.Path;
 

@@ -1,9 +1,9 @@
-package org.downloader.feature.downloader.repository;
+package org.downloader.feature.progress.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.downloader.feature.downloader.model.ContentDto;
-import org.downloader.feature.downloader.model.exceptions.ContentNotFoundException;
-import org.downloader.feature.downloader.repository.mapper.ContentMapper;
+import org.downloader.feature.progress.model.ContentDto;
+import org.downloader.common.exceptions.ContentNotFoundException;
+import org.downloader.feature.progress.repository.mapper.ContentMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository

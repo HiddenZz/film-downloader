@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.downloader.common.utils.Completer;
 import org.downloader.feature.downloader.model.DownloadTask;
-import org.downloader.feature.downloader.model.FormattingTask;
+import org.downloader.feature.formating.model.FormattingTask;
 import org.downloader.feature.downloader.service.DownloaderService;
-import org.downloader.feature.downloader.service.FormatterService;
+import org.downloader.feature.formating.service.FormatterService;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

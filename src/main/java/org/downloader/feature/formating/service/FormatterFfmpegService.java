@@ -1,4 +1,4 @@
-package org.downloader.feature.downloader.service;
+package org.downloader.feature.formating.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +6,7 @@ import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
-import org.downloader.feature.downloader.model.FormattingTask;
+import org.downloader.feature.formating.model.FormattingTask;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;

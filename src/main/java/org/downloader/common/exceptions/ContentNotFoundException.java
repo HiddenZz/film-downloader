@@ -1,4 +1,4 @@
-package org.downloader.feature.downloader.model.exceptions;
+package org.downloader.common.exceptions;
 
 public class ContentNotFoundException extends RuntimeException {
     public ContentNotFoundException(String message) {

@@ -1,4 +1,4 @@
-package org.downloader.feature.downloader.model;
+package org.downloader.feature.formating.model;
 
 
 public record FormattingTask(long tmdbId, String contentUuid, String contentName, String filePath) {
