@@ -7,7 +7,9 @@ import org.downloader.feature.progress.model.ContentDto;
 @Mapper
 public interface ContentMapper {
 
-    int insert(@Param("dto") ContentDto dto);
+    boolean isExists(String contentUuid);
+
+    long insert(@Param("dto") ContentDto dto);
 
     int updateState(@Param("dto") ContentDto dto);
 }

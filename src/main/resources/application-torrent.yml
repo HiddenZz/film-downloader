@@ -1,4 +1,4 @@
-downloader:
+downloading-listener:
   group: downloader-torrent
   name: torrent
 

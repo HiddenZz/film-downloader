@@ -3,8 +3,8 @@ package org.downloader.feature.progress.event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.downloader.common.configuration.properties.DownloaderProperties;
-import org.downloader.common.configuration.properties.FormattingProperties;
+import org.downloader.common.configuration.properties.DownloadingEventListenerProperties;
+import org.downloader.common.configuration.properties.FormattingEventListenerProperties;
 import org.downloader.common.exceptions.EventPublishException;
 import org.downloader.feature.progress.model.ContentState;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -19,15 +19,15 @@ public class ContentEventPublisher {
 
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
-    private final DownloaderProperties downloaderProperties;
-    private final FormattingProperties formattingProperties;
+    private final DownloadingEventListenerProperties downloadingEventListenerProperties;
+    private final FormattingEventListenerProperties formattingEventListenerProperties;
 
-    public void sendToFormatting(ContentState.DownloadSuccess state) {
-        publish(formattingProperties.stream(), state);
+    public void sendToFormatting(ContentState.Downloaded state) {
+        publish(formattingEventListenerProperties.stream(), state);
     }
 
-    public void sendCompleted(ContentState.Success state) {
-        publish(downloaderProperties.stream(), state);
+    public void sendCompleted(ContentState.Completed state) {
+        publish(downloadingEventListenerProperties.stream(), state);
     }
 
     private void publish(String stream, Object payload) {

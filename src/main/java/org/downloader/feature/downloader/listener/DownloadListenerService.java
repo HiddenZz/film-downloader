@@ -1,4 +1,4 @@
-package org.downloader.feature.listener.service;
+package org.downloader.feature.downloader.listener;
 
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.stream.StreamListener;

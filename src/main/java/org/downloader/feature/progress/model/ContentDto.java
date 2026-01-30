@@ -9,6 +9,5 @@ public class ContentDto {
     long tmdbId;
     String contentUuid;
     String state;
-    Integer progress;
     String errorCause;
 }

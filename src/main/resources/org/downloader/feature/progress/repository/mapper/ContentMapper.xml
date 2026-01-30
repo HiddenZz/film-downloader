@@ -4,19 +4,21 @@
 
 <mapper namespace="org.downloader.feature.progress.repository.mapper.ContentMapper">
 
-    <select id="insert" resultType="int">
+    <select id="isExists" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM content_state WHERE content_uuid = ${contentUuid})
+    </select>
+
+    <select id="insert" resultType="_long">
         INSERT INTO content_state(content_uuid, tmdb_id, state)
         VALUES (#{dto.contentUuid}, #{dto.tmdbId}, #{dto.state}) RETURNING id
     </select>
 
     <update id="updateState">
         UPDATE content_state
-        SET state       = COALESCE(#{dto.state}, state),
-            progress    = COALESCE(#{dto.progress}, progress),
-            error_cause = COALESCE(#{dto.errorCause}, error_cause),
+        SET state       = #{dto.state},
+            error_cause = #{dto.errorCause},
             updated_at  = NOW()
         WHERE content_uuid = #{dto.contentUuid}
     </update>
-
 
 </mapper>

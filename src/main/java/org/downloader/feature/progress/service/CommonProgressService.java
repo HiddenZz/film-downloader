@@ -20,45 +20,32 @@ public class CommonProgressService implements ProgressService {
     @Override
     public void report(ContentState state) {
         switch (state) {
-            case ContentState.Starting s -> handleStarting(s);
-            case ContentState.Progressing s -> handleProgress(s);
-            case ContentState.DownloadSuccess s -> handleDownloadSuccess(s);
-            case ContentState.Success s -> handleSuccess(s);
-            case ContentState.DownloadError s -> handleError(s);
+            case ContentState.Downloading s -> handleDownloading(s);
+            case ContentState.Downloaded s -> handleDownloaded(s);
+            case ContentState.DownloadFailed s -> handleDownloadFailed(s);
             case ContentState.Formatting s -> handleFormatting(s);
-            case ContentState.FormattingError s -> handleFormattingError(s);
+            case ContentState.Formatted s -> handleFormatted(s);
+            case ContentState.FormatFailed s -> handleFormatFailed(s);
+            case ContentState.Completed s -> handleCompleted(s);
         }
     }
 
-    private void handleStarting(ContentState.Starting state) {
-        contentRepository.create(ContentDto.builder()
-                                         .tmdbId(state.tmdbId())
-                                         .contentUuid(state.contentUuid())
-                                         .state(state.name())
-                                         .progress(0)
-                                         .build());
+    private void handleDownloading(ContentState.Downloading state) {
+        final ContentDto dto = toDto(state);
+        if (contentRepository.isExists(state.contentUuid())) {
+            contentRepository.updateState(dto);
+            return;
+        }
+
+        contentRepository.create(dto);
     }
 
-    private void handleProgress(ContentState.Progressing state) {
-        contentRepository.updateState(ContentDto.builder()
-                                              .tmdbId(state.tmdbId())
-                                              .contentUuid(state.contentUuid())
-                                              .state(state.name())
-                                              .progress(state.progress())
-                                              .build());
-    }
-
-    private void handleDownloadSuccess(ContentState.DownloadSuccess state) {
+    private void handleDownloaded(ContentState.Downloaded state) {
         contentRepository.updateState(toDto(state));
         eventPublisher.sendToFormatting(state);
     }
 
-    private void handleSuccess(ContentState.Success state) {
-        contentRepository.updateState(toDto(state));
-        eventPublisher.sendCompleted(state);
-    }
-
-    private void handleError(ContentState.DownloadError state) {
+    private void handleDownloadFailed(ContentState.DownloadFailed state) {
         contentRepository.updateState(ContentDto.builder()
                                               .tmdbId(state.tmdbId())
                                               .contentUuid(state.contentUuid())
@@ -71,8 +58,22 @@ public class CommonProgressService implements ProgressService {
         contentRepository.updateState(toDto(state));
     }
 
-    private void handleFormattingError(ContentState.FormattingError state) {
+    private void handleFormatted(ContentState.Formatted state) {
         contentRepository.updateState(toDto(state));
+    }
+
+    private void handleFormatFailed(ContentState.FormatFailed state) {
+        contentRepository.updateState(ContentDto.builder()
+                                              .tmdbId(state.tmdbId())
+                                              .contentUuid(state.contentUuid())
+                                              .state(state.name())
+                                              .errorCause(state.cause())
+                                              .build());
+    }
+
+    private void handleCompleted(ContentState.Completed state) {
+        contentRepository.updateState(toDto(state));
+        eventPublisher.sendCompleted(state);
     }
 
     private ContentDto toDto(ContentState state) {

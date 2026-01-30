@@ -1,12 +1,13 @@
-package org.downloader.feature.downloader.service;
+package org.downloader.feature.downloader.service.torrent;
 
 import bt.BtClientBuilder;
 import bt.runtime.BtClient;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.downloader.common.configuration.properties.BtProperties;
-import org.downloader.feature.downloader.model.DownloadTask;
-import org.downloader.feature.downloader.model.TorrentTask;
+import org.downloader.common.utils.ConditionalOnTorrentProfile;
+import org.downloader.feature.downloader.service.DownloaderService;
+import org.downloader.feature.downloader.model.torrent.TorrentTask;
 import org.downloader.feature.progress.service.ProgressService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -18,42 +19,34 @@ import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
-@ConditionalOnProperty(name = "downloader.name", havingValue = "torrent")
+@ConditionalOnTorrentProfile
 @AllArgsConstructor
 @Slf4j
-public class TorrentDownloaderService implements DownloaderService {
+public class TorrentDownloaderService implements DownloaderService<TorrentTask> {
 
     final BtClientBuilder btClientBuilder;
     final ProgressService progressService;
     final BtProperties properties;
+    final RestClient restClient;
 
     @Override
-    public void download(DownloadTask data) {
-        final TorrentTask.TorrentPayload payload = ((TorrentTask) data).payload();
-        final Path tempDir = tempTorrentPath(payload.cacheGuid(), downloadTorrentFile(payload));
-        final StateReporterHelper reporter = new StateReporterHelper(progressService, payload, tempDir);
-
-        final AtomicBoolean isDownload = new AtomicBoolean(false);
+    public void accept(TorrentTask data) {
+        final TorrentTask.TorrentPayload payload = data.payload();
+        final Path torrentPath = tempTorrentPath(payload.cacheGuid(), downloadTorrentFile(payload));
+        final TorrentStateReporter reporter = new TorrentStateReporter(progressService, payload, torrentPath.getParent());
 
         try {
-            reporter.starting();
+            reporter.downloading();
 
             final BtClient btClient = btClientBuilder
                     .afterFileDownloaded((torrent, tf, _) -> {
-                        isDownload.set(true);
-                        reporter.downloadSuccess(torrent, tf);
+                        reporter.downloaded(torrent, tf);
                     })
                     .stopWhenDownloaded()
-                    .torrent(tempDir.toUri().toURL())
+                    .torrent(torrentPath.toUri().toURL())
                     .build();
 
-            btClient.startAsync((state) -> {
-                if (isDownload.get()) {
-                    return;
-                }
-
-                reporter.progress(state);
-            }, 1000).join();
+            btClient.startAsync(reporter::progress, 1000).join();
 
         } catch (Exception e) {
             log.error("Error during download torrent file for error {} task {}", e, data);
@@ -63,9 +56,7 @@ public class TorrentDownloaderService implements DownloaderService {
 
     private Path tempTorrentPath(String name, byte[] torrent) {
         try {
-            final Path tempPath = Path.of(properties.tempDir());
-            Files.write(Files.createTempFile(tempPath, name, ".torrent"), torrent);
-            return tempPath;
+            return Files.write(Files.createTempFile(Path.of(properties.tempDir()), name, ".torrent"), torrent);
         } catch (IOException e) {
             throw new RuntimeException("Exception during create temp Torrent Path ");
         }
@@ -73,8 +64,7 @@ public class TorrentDownloaderService implements DownloaderService {
 
 
     private byte[] downloadTorrentFile(TorrentTask.TorrentPayload payload) {
-        final RestClient restClient = RestClient.builder().build();
-
+        
         return restClient.get()
                 .uri(payload.link()).retrieve()
                 .body(byte[].class);

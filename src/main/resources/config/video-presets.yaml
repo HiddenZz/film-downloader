@@ -1,0 +1,41 @@
+video-formatting:
+  presets:
+    - name: "1080p"
+      resolution:
+        width: 1920
+        height: 1080
+      videoBitrate: "5000k"
+      audioBitrate: "192k"
+      videoCodec: "libx264"
+      audioCodec: "aac"
+      crf: 23
+      preset: "medium"
+      enabled: true
+
+    - name: "720p"
+      resolution:
+        width: 1280
+        height: 720
+      videoBitrate: "2500k"
+      audioBitrate: "128k"
+      videoCodec: "libx264"
+      audioCodec: "aac"
+      crf: 23
+      preset: "medium"
+      enabled: true
+
+    - name: "480p"
+      resolution:
+        width: 854
+        height: 480
+      videoBitrate: "1000k"
+      audioBitrate: "96k"
+      videoCodec: "libx264"
+      audioCodec: "aac"
+      crf: 23
+      preset: "medium"
+      enabled: false
+
+  output:
+    format: "mp4"
+    faststart: true

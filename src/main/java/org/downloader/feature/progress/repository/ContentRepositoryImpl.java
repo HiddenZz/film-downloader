@@ -12,9 +12,13 @@ public class ContentRepositoryImpl implements ContentRepository {
 
     private final ContentMapper contentMapper;
 
+    public boolean isExists(String contentUuid) {
+        return contentMapper.isExists(contentUuid);
+    }
+
     public void create(ContentDto dto) {
-        int rows = contentMapper.insert(dto);
-        if (rows == 0) {
+        long id = contentMapper.insert(dto);
+        if (id == 0) {
             throw new IllegalStateException("Failed to create content: " + dto.getContentUuid());
         }
     }

@@ -1,28 +1,28 @@
-package org.downloader.feature.downloader.service;
+package org.downloader.feature.downloader.service.torrent;
 
 import bt.metainfo.Torrent;
 import bt.metainfo.TorrentFile;
 import bt.torrent.TorrentSessionState;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.downloader.feature.downloader.model.torrent.TorrentTask;
 import org.downloader.feature.progress.model.ContentState;
-import org.downloader.feature.downloader.model.TorrentTask;
 import org.downloader.feature.progress.service.ProgressService;
 
 import java.nio.file.Path;
 
 @Slf4j
 @AllArgsConstructor
-public class StateReporterHelper {
+public class TorrentStateReporter {
 
-    final private ProgressService progressService;
-    final private TorrentTask.TorrentPayload payload;
-    final private Path tempDir;
+    private final ProgressService progressService;
+    private final TorrentTask.TorrentPayload payload;
+    private final Path tempDir;
 
-    void starting() {
-        progressService.report(ContentState.Starting.builder()
+    void downloading() {
+        progressService.report(ContentState.Downloading.builder()
+                                       .tmdbId(payload.tmdbId())
                                        .contentUuid(payload.cacheGuid())
-                                       .tmdbId(1)
                                        .build());
     }
 
@@ -32,27 +32,27 @@ public class StateReporterHelper {
 
         log.info("Task: {} | progress: {}% | seeders: {} | peers: {}",
                  payload.cacheGuid().substring(0, 5), progress, payload.seeders(), state.getConnectedPeers());
-
-        progressService.report(ContentState.Progressing.builder()
-                                       .progress(progress)
-                                       .tmdbId(1)
-                                       .contentUuid(payload.cacheGuid())
-                                       .build());
     }
 
-
-    void downloadSuccess(Torrent torrent, TorrentFile tf) {
+    void downloaded(Torrent torrent, TorrentFile tf) {
         Path fullPath = tempDir;
         for (String el : tf.getPathElements()) {
             fullPath = fullPath.resolve(el);
         }
 
-        progressService.report(ContentState.DownloadSuccess.builder()
+        progressService.report(ContentState.Downloaded.builder()
                                        .contentUuid(payload.cacheGuid())
                                        .contentName(torrent.getName())
                                        .filePath(fullPath.toString())
-                                       .tmdbId(1)
+                                       .tmdbId(payload.tmdbId())
                                        .build());
     }
 
+    void downloadFailed(String cause) {
+        progressService.report(ContentState.DownloadFailed.builder()
+                                       .tmdbId(payload.tmdbId())
+                                       .contentUuid(payload.cacheGuid())
+                                       .cause(cause)
+                                       .build());
+    }
 }

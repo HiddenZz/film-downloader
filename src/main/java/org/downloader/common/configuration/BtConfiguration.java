@@ -12,6 +12,7 @@ import bt.runtime.Config;
 import bt.torrent.selector.PieceSelector;
 import bt.torrent.selector.SequentialSelector;
 import org.downloader.common.configuration.properties.BtProperties;
+import org.downloader.common.utils.ConditionalOnTorrentProfile;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,10 +20,8 @@ import org.springframework.context.annotation.Configuration;
 import java.nio.file.Paths;
 
 @Configuration
-@ConditionalOnProperty(name = "downloader.name", havingValue = "torrent")
-
+@ConditionalOnTorrentProfile
 public class BtConfiguration {
-
 
     @Bean
     BtClientBuilder btClientBuilder(BtRuntime btRuntime, BtProperties properties) {

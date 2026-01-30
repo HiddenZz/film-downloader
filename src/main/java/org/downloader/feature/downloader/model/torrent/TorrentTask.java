@@ -1,5 +1,6 @@
-package org.downloader.feature.downloader.model;
+package org.downloader.feature.downloader.model.torrent;
 
+import org.downloader.feature.downloader.model.DownloadTask;
 
 public record TorrentTask(TorrentPayload payload) implements DownloadTask {
 

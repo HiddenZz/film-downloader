@@ -4,6 +4,8 @@ import org.downloader.feature.progress.model.ContentDto;
 
 public interface ContentRepository {
 
+    boolean isExists(String contentUuid);
+
     void create(ContentDto dto);
 
     void updateState(ContentDto dto);
