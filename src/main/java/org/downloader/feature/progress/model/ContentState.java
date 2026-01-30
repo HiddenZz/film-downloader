@@ -52,6 +52,6 @@ public sealed interface ContentState permits
 
     @Builder
     @Named("COMPLETED")
-    record Completed(long tmdbId, String contentUuid, String minioUrl) implements ContentState {
+    record Completed(long tmdbId, String contentUuid, String filePath) implements ContentState {
     }
 }

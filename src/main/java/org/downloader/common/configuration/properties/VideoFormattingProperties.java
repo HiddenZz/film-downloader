@@ -9,23 +9,23 @@ import java.util.List;
 
 @ConfigurationProperties("video-formatting")
 @Getter
-@Setter
 public class VideoFormattingProperties {
 
-    private FfmpegConfig ffmpeg;
-    private List<PresetConfig> presets;
-    private OutputConfig output;
+    private final FfmpegConfig ffmpeg;
+    private final List<PresetConfig> presets;
+    private final OutputConfig output;
 
-    @PostConstruct
-    protected void init() {
-        presets = presets.stream().filter(PresetConfig::enabled).toList();
+    public VideoFormattingProperties(FfmpegConfig ffmpeg, List<PresetConfig> presets, OutputConfig output) {
+        this.ffmpeg = ffmpeg;
+        this.presets = presets.stream().filter(PresetConfig::enabled).toList();
+        this.output = output;
     }
 
     public record FfmpegConfig(String threads) {
     }
 
     public record PresetConfig(
-            String name, Resolution resolution, String videoBitrate, String audioBitrate,
+            String name, Resolution resolution, long videoBitrate, long audioBitrate,
             String videoCodec, String audioCodec, int crf, String preset, boolean enabled
     ) {
         public record Resolution(int width, int height) {

@@ -4,8 +4,8 @@ video-formatting:
       resolution:
         width: 1920
         height: 1080
-      videoBitrate: "5000k"
-      audioBitrate: "192k"
+      videoBitrate: 5_000_000
+      audioBitrate: 192_000
       videoCodec: "libx264"
       audioCodec: "aac"
       crf: 23
@@ -16,8 +16,8 @@ video-formatting:
       resolution:
         width: 1280
         height: 720
-      videoBitrate: "2500k"
-      audioBitrate: "128k"
+      videoBitrate: 2_500_000
+      audioBitrate: 128_000
       videoCodec: "libx264"
       audioCodec: "aac"
       crf: 23
@@ -28,8 +28,8 @@ video-formatting:
       resolution:
         width: 854
         height: 480
-      videoBitrate: "1000k"
-      audioBitrate: "96k"
+      videoBitrate: 1_000_000
+      audioBitrate: 96_000
       videoCodec: "libx264"
       audioCodec: "aac"
       crf: 23
