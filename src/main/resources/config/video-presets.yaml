@@ -34,7 +34,19 @@ video-formatting:
       audioCodec: "aac"
       crf: 23
       preset: "medium"
-      enabled: false
+      enabled: true
+
+    - name: "minimal"
+      resolution:
+        width: 426
+        height: 240
+      videoBitrate: 1_000_000
+      audioBitrate: 96_000
+      videoCodec: "libx264"
+      audioCodec: "aac"
+      crf: 20
+      preset: "medium"
+      enabled: true
 
   output:
     format: "mp4"

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class CommonProgressService implements ProgressService {
+public class ContentStateReporterImpl implements ContentStateReporter {
 
     private final ContentRepository contentRepository;
     private final ContentEventPublisher eventPublisher;
@@ -30,9 +30,10 @@ public class CommonProgressService implements ProgressService {
         }
     }
 
+
     private void handleDownloading(ContentState.Downloading state) {
         final ContentDto dto = toDto(state);
-        if (contentRepository.isExists(state.contentUuid())) {
+        if (contentRepository.isExists(state.getContentUuid())) {
             contentRepository.updateState(dto);
             return;
         }
@@ -47,10 +48,10 @@ public class CommonProgressService implements ProgressService {
 
     private void handleDownloadFailed(ContentState.DownloadFailed state) {
         contentRepository.updateState(ContentDto.builder()
-                                              .tmdbId(state.tmdbId())
-                                              .contentUuid(state.contentUuid())
+                                              .tmdbId(state.getTmdbId())
+                                              .contentUuid(state.getContentUuid())
                                               .state(state.name())
-                                              .errorCause(state.cause())
+                                              .errorCause(state.getCause())
                                               .build());
     }
 
@@ -64,10 +65,10 @@ public class CommonProgressService implements ProgressService {
 
     private void handleFormatFailed(ContentState.FormatFailed state) {
         contentRepository.updateState(ContentDto.builder()
-                                              .tmdbId(state.tmdbId())
-                                              .contentUuid(state.contentUuid())
+                                              .tmdbId(state.getTmdbId())
+                                              .contentUuid(state.getContentUuid())
                                               .state(state.name())
-                                              .errorCause(state.cause())
+                                              .errorCause(state.getCause())
                                               .build());
     }
 
@@ -78,8 +79,8 @@ public class CommonProgressService implements ProgressService {
 
     private ContentDto toDto(ContentState state) {
         return ContentDto.builder()
-                .tmdbId(state.tmdbId())
-                .contentUuid(state.contentUuid())
+                .tmdbId(state.getTmdbId())
+                .contentUuid(state.getContentUuid())
                 .state(state.name())
                 .build();
     }

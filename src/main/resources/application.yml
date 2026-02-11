@@ -17,10 +17,10 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
-    schemas: film_stream
-    default-schema: film_stream
+    schemas: film_download
+    default-schema: film_download
   datasource:
-    url: jdbc:postgresql://localhost:5432/movie?currentSchema=film_stream
+    url: jdbc:postgresql://localhost:5432/movie?currentSchema=film_download
     username: movie_user
     password: movie
     driver-class-name: org.postgresql.Driver

@@ -11,6 +11,7 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -24,9 +25,8 @@ dependencies {
     implementation("com.github.atomashpolskiy:bt-dht:1.10")
 
     // content formatter
-    implementation("net.bramp.ffmpeg:ffmpeg:0.8.0")
-
-
+    implementation 'com.github.bramp:ffmpeg-cli-wrapper:master'
+    
     implementation("redis.clients:jedis:7.2.0")
     implementation("org.postgresql:postgresql:42.7.7")
     implementation 'org.mybatis:mybatis:3.5.19'

@@ -27,7 +27,7 @@ public class ContentEventPublisher {
     }
 
     public void sendCompleted(ContentState.Completed state) {
-        publish(downloadingEventListenerProperties.stream(), state);
+        
     }
 
     private void publish(String stream, Object payload) {

@@ -3,12 +3,11 @@ package org.downloader.feature.downloader.service.torrent;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.downloader.common.configuration.properties.BtProperties;
+import org.downloader.common.utils.ConditionalOnTorrentProfile;
 import org.downloader.feature.downloader.service.DownloaderService;
 import org.downloader.feature.downloader.model.torrent.TorrentTask;
 import org.downloader.feature.progress.model.ContentState;
-import org.downloader.feature.progress.service.ProgressService;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Primary;
+import org.downloader.feature.progress.service.ContentStateReporterImpl;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
@@ -17,7 +16,7 @@ import java.nio.file.Path;
 @Slf4j
 public class MockTorrentDownloaderService implements DownloaderService<TorrentTask> {
 
-    private final ProgressService progressService;
+    private final ContentStateReporterImpl contentStateReporterImpl;
     private final BtProperties btProperties;
 
     @Override
@@ -28,12 +27,12 @@ public class MockTorrentDownloaderService implements DownloaderService<TorrentTa
 
             final Path file = Path.of(btProperties.tempDir(), "test.avi");
 
-            progressService.report(ContentState.Downloaded.builder()
-                                           .tmdbId(payload.tmdbId())
-                                           .contentUuid(uuid)
-                                           .contentName(payload.title())
-                                           .filePath(file.toString())
-                                           .build());
+            contentStateReporterImpl.report(ContentState.Downloaded.builder()
+                                                    .tmdbId(payload.tmdbId())
+                                                    .contentUuid(uuid)
+                                                    .contentName(payload.title())
+                                                    .filePath(file.toString())
+                                                    .build());
 
         } catch (Exception e) {
             log.info("MockTorrentDownloaderService has error", e);

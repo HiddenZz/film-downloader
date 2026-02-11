@@ -5,7 +5,7 @@
 <mapper namespace="org.downloader.feature.progress.repository.mapper.ContentMapper">
 
     <select id="isExists" resultType="boolean">
-        SELECT EXISTS(SELECT 1 FROM content_state WHERE content_uuid = ${contentUuid})
+        SELECT EXISTS(SELECT 1 FROM content_state WHERE content_uuid = #{contentUuid})
     </select>
 
     <select id="insert" resultType="_long">

@@ -1,9 +1,14 @@
 package org.downloader.feature.progress.model;
 
-import lombok.Builder;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.downloader.common.utils.Name;
 import org.downloader.common.utils.Named;
 
-public sealed interface ContentState permits
+@AllArgsConstructor
+@SuperBuilder
+@Getter
+public abstract sealed class ContentState implements Name permits
         ContentState.Downloading,
         ContentState.Downloaded,
         ContentState.DownloadFailed,
@@ -12,46 +17,54 @@ public sealed interface ContentState permits
         ContentState.FormatFailed,
         ContentState.Completed {
 
-    String contentUuid();
+    private final long tmdbId;
+    private final String contentUuid;
 
-    long tmdbId();
 
-    default String name() {
-        return getClass().getAnnotation(Named.class).value();
-    }
-
-    @Builder
+    @SuperBuilder
+    @Getter
     @Named("DOWNLOADING")
-    record Downloading(long tmdbId, String contentUuid) implements ContentState {
+    public static final class Downloading extends ContentState {
     }
 
-    @Builder
+    @SuperBuilder
+    @Getter
     @Named("DOWNLOADED")
-    record Downloaded(long tmdbId, String contentUuid, String contentName, String filePath) implements ContentState {
+    public static final class Downloaded extends ContentState {
+        private final String contentName;
+        private final String filePath;
     }
 
-    @Builder
+    @SuperBuilder
+    @Getter
     @Named("DOWNLOAD_FAILED")
-    record DownloadFailed(long tmdbId, String contentUuid, String cause) implements ContentState {
+    public static final class DownloadFailed extends ContentState {
+        private final String cause;
     }
 
-    @Builder
+    @SuperBuilder
+    @Getter
     @Named("FORMATTING")
-    record Formatting(long tmdbId, String contentUuid) implements ContentState {
+    public static final class Formatting extends ContentState {
     }
 
-    @Builder
+    @SuperBuilder
+    @Getter
     @Named("FORMATTED")
-    record Formatted(long tmdbId, String contentUuid) implements ContentState {
+    public static final class Formatted extends ContentState {
     }
 
-    @Builder
+    @SuperBuilder
+    @Getter
     @Named("FORMAT_FAILED")
-    record FormatFailed(long tmdbId, String contentUuid, String cause) implements ContentState {
+    public static final class FormatFailed extends ContentState {
+        private final String cause;
     }
 
-    @Builder
+    @SuperBuilder
+    @Getter
     @Named("COMPLETED")
-    record Completed(long tmdbId, String contentUuid, String filePath) implements ContentState {
+    public static final class Completed extends ContentState {
+        private final String filePath;
     }
 }
