@@ -4,6 +4,7 @@ import org.downloader.common.configuration.properties.DownloadingEventListenerPr
 import org.downloader.common.utils.ConditionalOnTorrentProfile;
 import org.downloader.feature.downloader.listener.RedisDownloadListener;
 import org.downloader.feature.downloader.model.torrent.TorrentTask;
+import org.downloader.feature.downloader.service.DownloaderService;
 import org.downloader.feature.infrastructure.redis.TaskAllocatorService;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ public class TorrentDownloadListener extends RedisDownloadListener<TorrentTask> 
                                    DownloadingEventListenerProperties properties,
                                    TaskAllocatorService taskAllocatorService,
                                    TorrentTaskDeserializer taskDeserializer,
-                                   TorrentDownloaderService downloaderService) {
+                                   DownloaderService<TorrentTask> downloaderService) {
         super(redis, properties, taskAllocatorService, taskDeserializer, downloaderService);
     }
 }

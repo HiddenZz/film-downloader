@@ -11,10 +11,9 @@ import org.downloader.common.utils.Named;
 public abstract sealed class ContentState implements Name permits
         ContentState.Downloading,
         ContentState.Downloaded,
-        ContentState.DownloadFailed,
         ContentState.Formatting,
         ContentState.Formatted,
-        ContentState.FormatFailed,
+        ContentState.Failed,
         ContentState.Completed {
 
     private final long tmdbId;
@@ -37,13 +36,6 @@ public abstract sealed class ContentState implements Name permits
 
     @SuperBuilder
     @Getter
-    @Named("DOWNLOAD_FAILED")
-    public static final class DownloadFailed extends ContentState {
-        private final String cause;
-    }
-
-    @SuperBuilder
-    @Getter
     @Named("FORMATTING")
     public static final class Formatting extends ContentState {
     }
@@ -52,19 +44,21 @@ public abstract sealed class ContentState implements Name permits
     @Getter
     @Named("FORMATTED")
     public static final class Formatted extends ContentState {
+        private final String masterPlaylistPath;
     }
 
-    @SuperBuilder
-    @Getter
-    @Named("FORMAT_FAILED")
-    public static final class FormatFailed extends ContentState {
-        private final String cause;
-    }
 
     @SuperBuilder
     @Getter
     @Named("COMPLETED")
     public static final class Completed extends ContentState {
-        private final String filePath;
+
+    }
+
+    @SuperBuilder
+    @Getter
+    @Named("FAILED")
+    public static final class Failed extends ContentState {
+        private final String cause;
     }
 }

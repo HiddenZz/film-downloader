@@ -1,6 +1,7 @@
 package org.downloader.feature.formatting.service.ffmpeg;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
@@ -17,11 +18,12 @@ import org.downloader.feature.progress.service.ContentStateReporter;
 import org.downloader.feature.progress.service.ProgressReporter;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
@@ -47,38 +49,61 @@ public class FfmpegFormatterService implements FormatterService {
                 throw new ConversionSourceNotFoundException(inputPath);
             }
 
+            final Path outputDir = Files.createDirectories(inputPath.resolveSibling("%s/".formatted(task.contentUuid())));
+
             final FFmpegProbeResult probe = ffprobe.probe(inputPath.toString());
 
-            final List<CompletableFuture<String>> jobs = formattingProperties.getPresets().stream()
+            final List<CompletableFuture<CompletedJob>> jobs = formattingProperties.getPresets().stream()
                     .filter((preset) -> probe.getStreams().stream()
                             .filter((stream) -> stream.codec_type == FFmpegStream.CodecType.VIDEO)
                             .anyMatch((stream) -> stream.height >= preset.resolution().height()))
                     .map((preset) -> {
-                             final String outputPath = inputPath.resolveSibling(buildOutputFileName(task, preset.resolution()
-                                     .height())).toString();
-                             return new JobRecord(preset.name(), outputPath, new FFmpegBuilder()
-                                     .setInput(inputPath.toString())
-                                     .overrideOutputFiles(true)
-                                     .addOutput(outputPath)
-                                     .setVideoCodec(preset.videoCodec())
-                                     .setAudioCodec(preset.audioCodec())
-                                     .setVideoQuality(preset.crf())
-                                     .setPreset(preset.preset())
-                                     .setAudioBitRate(preset.audioBitrate())
-                                     .done());
+                             try {
+                                 final Path outputByPresetDir = Files.createDirectories(outputDir.resolve("%s".formatted(preset.name())));
+                                 return JobRecord
+                                         .builder()
+                                         .config(preset)
+                                         .ffmpegBuilder(
+                                                 new FFmpegBuilder()
+                                                         .setInput(inputPath.toString())
+                                                         .overrideOutputFiles(true)
+                                                         .addOutput(outputByPresetDir.resolve("%s".formatted("playlist.m3u8"))
+                                                                            .toString())
+                                                         .setFormat("hls")
+                                                         .addExtraArgs("-hls_time", "10")
+                                                         .addExtraArgs("-hls_list_size", "0")
+                                                         .addExtraArgs("-hls_segment_filename",
+                                                                       outputByPresetDir.resolve("segment_%03d.ts")
+                                                                               .toString())
+                                                         .setVideoCodec(preset.videoCodec())
+                                                         .setAudioCodec(preset.audioCodec())
+                                                         .setVideoQuality(preset.crf())
+                                                         .setPreset(preset.preset())
+                                                         .setAudioBitRate(preset.audioBitrate())
+                                                         .done())
+                                         .build();
+                             } catch (Exception e) {
+                                 log.error("Exception during create dir for quality: %s for: %s".formatted(preset.name(), task.tmdbId()), e);
+                                 return null;
+                             }
                          }
                     )
-                    .map((job) -> (Supplier<String>) () -> {
-                        executor.createJob(job.builder, progress -> {
+                    .filter(Objects::nonNull)
+                    .map((job) -> (Supplier<CompletedJob>) () -> {
+                        executor.createJob(job.ffmpegBuilder, progress -> {
                             final int percentComplete = (int) Math.round(Duration.ofNanos(progress.out_time_ns)
                                                                                  .toSeconds() / probe.format.duration * 100);
                             progressReporter.formatting(Progress.builder()
-                                                                .quality(Optional.of(job.qualityPreset))
+                                                                .quality(job.config.name())
                                                                 .tmdbId(task.tmdbId())
                                                                 .contentUuid((task.contentUuid()))
                                                                 .progress(percentComplete).build());
                         }).run();
-                        return job.outputPath;
+                        return CompletedJob.builder()
+                                .qualityName(job.config.name())
+                                .bandwidth(job.config.audioBitrate() + job.config.videoBitrate())
+                                .resolution(job.config.resolution().view())
+                                .build();
                     })
                     .map(CompletableFuture::supplyAsync)
                     .toList();
@@ -95,26 +120,26 @@ public class FfmpegFormatterService implements FormatterService {
                 throw new RuntimeException(unityException);
             }
 
-            jobs.stream()
+
+            final List<CompletedJob> completed = jobs.stream()
                     .filter(f -> f.state() == Future.State.SUCCESS)
-                    .map(CompletableFuture::resultNow).findFirst()
-                    .ifPresent((outputPath) -> {
-                        try {
-                            contentStateReporter.report(ContentState.Completed.builder()
-                                                                .tmdbId(task.tmdbId())
-                                                                .contentUuid(task.contentUuid())
-                                                                .filePath(outputPath)
-                                                                .build());
-                        } catch (RuntimeException e) {
-                            log.error("Error during save progress formatted video {}", task.contentName(), e);
-                        }
-                    });
+                    .map(CompletableFuture::resultNow).toList();
+
+            if (completed.isEmpty()) {
+                throw new RuntimeException("none of formatting tasks were completed successfully");
+            }
+
+            contentStateReporter.report(ContentState.Formatted.builder()
+                                                .tmdbId(task.tmdbId())
+                                                .contentUuid(task.contentUuid())
+                                                .masterPlaylistPath(generateMasterPlaylist(outputDir, completed).toString())
+                                                .build());
 
 
         } catch (Exception e) {
             log.error("Error during format video name {}", task.contentName(), e);
 
-            contentStateReporter.report(ContentState.FormatFailed.builder()
+            contentStateReporter.report(ContentState.Failed.builder()
                                                 .tmdbId(task.tmdbId())
                                                 .contentUuid(task.contentUuid())
                                                 .cause("All formating jobs completed with message %s".formatted(e.getMessage()))
@@ -123,11 +148,26 @@ public class FfmpegFormatterService implements FormatterService {
     }
 
 
-    private String buildOutputFileName(FormattingTask task, int height) {
-        return "%s-%s.%s".formatted(height, task.contentName(), formattingProperties.getOutput().format());
+    Path generateMasterPlaylist(Path outputDir, List<CompletedJob> jobs) throws IOException {
+        StringBuilder playlist = new StringBuilder();
+        playlist.append("#EXTM3U\n");
+        playlist.append("#EXT-X-VERSION:3\n");
+
+        for (CompletedJob job : jobs) {
+            playlist.append("#EXT-X-STREAM-INF:BANDWIDTH=%d,RESOLUTION=%s\n"
+                                    .formatted(job.bandwidth(), job.resolution()));
+            playlist.append("%s/playlist.m3u8\n".formatted(job.qualityName()));
+        }
+
+        return Files.writeString(outputDir.resolve("master.m3u8"), playlist.toString());
     }
 
-    record JobRecord(String qualityPreset, String outputPath, FFmpegBuilder builder) {
+    @Builder
+    record JobRecord(VideoFormattingProperties.PresetConfig config, FFmpegBuilder ffmpegBuilder) {
+    }
+
+    @Builder
+    record CompletedJob(String qualityName, long bandwidth, String resolution) {
     }
 
 }

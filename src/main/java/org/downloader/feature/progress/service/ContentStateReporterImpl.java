@@ -22,11 +22,10 @@ public class ContentStateReporterImpl implements ContentStateReporter {
         switch (state) {
             case ContentState.Downloading s -> handleDownloading(s);
             case ContentState.Downloaded s -> handleDownloaded(s);
-            case ContentState.DownloadFailed s -> handleDownloadFailed(s);
             case ContentState.Formatting s -> handleFormatting(s);
             case ContentState.Formatted s -> handleFormatted(s);
-            case ContentState.FormatFailed s -> handleFormatFailed(s);
             case ContentState.Completed s -> handleCompleted(s);
+            case ContentState.Failed s -> handleFailed(s);
         }
     }
 
@@ -46,14 +45,6 @@ public class ContentStateReporterImpl implements ContentStateReporter {
         eventPublisher.sendToFormatting(state);
     }
 
-    private void handleDownloadFailed(ContentState.DownloadFailed state) {
-        contentRepository.updateState(ContentDto.builder()
-                                              .tmdbId(state.getTmdbId())
-                                              .contentUuid(state.getContentUuid())
-                                              .state(state.name())
-                                              .errorCause(state.getCause())
-                                              .build());
-    }
 
     private void handleFormatting(ContentState.Formatting state) {
         contentRepository.updateState(toDto(state));
@@ -61,20 +52,21 @@ public class ContentStateReporterImpl implements ContentStateReporter {
 
     private void handleFormatted(ContentState.Formatted state) {
         contentRepository.updateState(toDto(state));
+        eventPublisher.sendSaveToS3(state);
     }
 
-    private void handleFormatFailed(ContentState.FormatFailed state) {
+
+    private void handleCompleted(ContentState.Completed state) {
+        contentRepository.updateState(toDto(state));
+    }
+
+    private void handleFailed(ContentState.Failed state) {
         contentRepository.updateState(ContentDto.builder()
                                               .tmdbId(state.getTmdbId())
                                               .contentUuid(state.getContentUuid())
                                               .state(state.name())
                                               .errorCause(state.getCause())
                                               .build());
-    }
-
-    private void handleCompleted(ContentState.Completed state) {
-        contentRepository.updateState(toDto(state));
-        eventPublisher.sendCompleted(state);
     }
 
     private ContentDto toDto(ContentState state) {

@@ -29,7 +29,9 @@ public class VideoFormattingProperties {
             String videoCodec, String audioCodec, int crf, String preset, boolean enabled
     ) {
         public record Resolution(int width, int height) {
-
+            public String view() {
+                return "%sx%s".formatted(width, height);
+            }
         }
     }
 

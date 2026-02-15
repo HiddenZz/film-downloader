@@ -36,10 +36,10 @@ video-formatting:
       preset: "medium"
       enabled: true
 
-    - name: "minimal"
+    - name: "360p"
       resolution:
-        width: 426
-        height: 240
+        width: 460
+        height: 360
       videoBitrate: 1_000_000
       audioBitrate: 96_000
       videoCodec: "libx264"

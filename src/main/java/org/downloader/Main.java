@@ -5,10 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.ApplicationContext;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-@SpringBootApplication
 @ConfigurationPropertiesScan(basePackages = "org.downloader.common.configuration")
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
 

@@ -16,7 +16,9 @@ import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 @ConditionalOnTorrentProfile
 @AllArgsConstructor
@@ -57,7 +59,8 @@ public class TorrentDownloaderService implements DownloaderService<TorrentTask> 
 
     private Path tempTorrentPath(String name, byte[] torrent) {
         try {
-            return Files.write(Path.of(properties.tempDir(), "%s.%s".formatted(name, "torrent")), torrent);
+            Files.createDirectories(Path.of(properties.tempDir()));
+            return Files.write(Path.of(properties.tempDir(), "%s.%s".formatted(name, "torrent")), torrent, StandardOpenOption.CREATE_NEW);
         } catch (IOException e) {
             throw new RuntimeException("Exception during create temp Torrent Path ", e);
         }

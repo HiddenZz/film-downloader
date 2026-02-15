@@ -56,7 +56,7 @@ public class TorrentReporterHelper {
     }
 
     void downloadFailed(String cause) {
-        contentStateReporter.report(ContentState.DownloadFailed.builder()
+        contentStateReporter.report(ContentState.Failed.builder()
                                             .tmdbId(payload.tmdbId())
                                             .contentUuid(payload.cacheGuid())
                                             .cause(cause)

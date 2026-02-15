@@ -10,6 +10,22 @@ formatting-listener:
   consumer: ${HOSTNAME:local}
   group: main-formatter-group
 
+save-s3-listener:
+  stream: save:s3:stream
+  consumer: ${HOSTNAME:local}
+  group: main-saver-group
+
+
+storage:
+  s3:
+    top-prefix: content
+    hls-playlist-content-type: "application/vnd.apple.mpegurl"
+  minio:
+    credentials:
+      endpoint: http://127.0.0.1:9000/
+      name: "minioadmin"
+      password: "minioadmin123"
+
 
 spring:
   config:
@@ -28,6 +44,8 @@ spring:
     redis:
       host: localhost
       port: 6379
+
+
 
 
 logging:

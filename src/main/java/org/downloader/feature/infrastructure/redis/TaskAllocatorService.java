@@ -21,8 +21,6 @@ import java.util.function.Consumer;
 public class TaskAllocatorService {
 
     private final ExecutorService executorService;
-    private final FormatterService formatterService;
-    private final ObjectMapper objectMapper;
 
     public <T> void allocateDownloadTask(
             T task,
@@ -39,26 +37,4 @@ public class TaskAllocatorService {
             }
         });
     }
-
-//    public void allocateFormattingTask(Map<String, String> message, Completer ack, Consumer<Exception> onError) {
-//        executorService.submit(() -> {
-//            try {
-//                final FormattingTask task = deserializeMessage(message, FormattingTask.class);
-//
-//                if (task == null) {
-//                    log.warn("Empty or invalid formatting message");
-//                    return;
-//                }
-//
-//                formatterService.format(task);
-//
-//            } catch (Exception e) {
-//                onError.accept(e);
-//            } finally {
-//                ack.complete();
-//            }
-//        });
-//    }
-
-
 }

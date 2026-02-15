@@ -6,8 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.downloader.common.configuration.properties.DownloadingEventListenerProperties;
 import org.downloader.common.configuration.properties.FormattingEventListenerProperties;
+import org.downloader.common.configuration.properties.SaveS3EventListenerProperties;
 import org.downloader.feature.downloader.listener.DownloadListenerService;
 import org.downloader.feature.formatting.listener.FormattingListenerService;
+import org.downloader.feature.saver.listener.SaveS3ListenerService;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -33,13 +35,20 @@ public class StreamSetup {
     private final FormattingEventListenerProperties formattingEventListenerProperties;
     private final FormattingListenerService formattingListenerService;
 
+    private final SaveS3EventListenerProperties saveS3EventListenerProperties;
+    private final SaveS3ListenerService saveS3ListenerService;
+
+
     @PostConstruct
     void init() {
         createStreamAndGroup(downloadingEventListenerProperties.stream(), downloadingEventListenerProperties.group());
         createStreamAndGroup(formattingEventListenerProperties.stream(), formattingEventListenerProperties.group());
+        createStreamAndGroup(saveS3EventListenerProperties.stream(), saveS3EventListenerProperties.group());
 
         startDownloadListening();
         startFormattingListening();
+        startSaveS3Listening();
+        
         listenerContainer.start();
     }
 
@@ -96,6 +105,23 @@ public class StreamSetup {
 
         log.info("Started formatting listener on stream: {}", formattingEventListenerProperties.stream());
     }
+
+    private void startSaveS3Listening() {
+        listenerContainer.receive(
+                Consumer.from(
+                        saveS3EventListenerProperties.group(),
+                        saveS3EventListenerProperties.consumer()
+                ),
+                StreamOffset.create(
+                        saveS3EventListenerProperties.stream(),
+                        ReadOffset.lastConsumed()
+                ),
+                saveS3ListenerService
+        );
+
+        log.info("Started s3 saver listener on stream: {}", saveS3EventListenerProperties.stream());
+    }
+
 
     @PreDestroy
     void dispose() {

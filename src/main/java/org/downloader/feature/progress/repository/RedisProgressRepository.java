@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
+import java.util.Optional;
 
 
 @AllArgsConstructor
@@ -37,6 +38,6 @@ public class RedisProgressRepository implements ProgressRepository {
 
 
     private String key(Progress progress) {
-        return "%s:%s".formatted(progress.contentUuid(), progress.quality().orElse("none"));
+        return "%s:%s".formatted(progress.contentUuid(), Optional.ofNullable(progress.quality()).orElse("none"));
     }
 }
